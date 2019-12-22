@@ -7,13 +7,9 @@ To read the brief description of the solution, please, refer to [the Kaggle post
 ```
 .
 ./input                          : images and .csv files for mask labels
-./ouput                          : trained models and predictions
+./output                         : trained models, logs and predictions
 ./kaggle-cloud-organization      : code
 ```
-## Hardware:
-* Ubuntu 16.04 LTS (>=512 GB boot disk)
-* intel Xeon Gold 6130
-* 1 x NVIDIA Tesla V100 32GB
 
 ## Software:
 * Python 3.7.3
