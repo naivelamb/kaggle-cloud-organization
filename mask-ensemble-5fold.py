@@ -1,10 +1,9 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Oct 26 22:46:04 2019
+# @Author: Xuan Cao <xuan>
+# @Date:   2019-12-22, 1:25:27
+# @Last modified by:   xuan
+# @Last modified time: 2019-12-22, 1:33:27
 
-@author: xuan
-"""
+
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -81,19 +80,16 @@ df_train = pd.read_csv('../input/train_350.csv')
 df_train.rename(columns={'EncodedPixels': 'truth'}, inplace=True)
 
 _save=1
-tta=1
+tta=3
 ts=2
 
+ensemble_file_name = 'b5-Unet-inception-FPN-b7-Unet-b7-FPN-b7-FPNPL'
 segs = [
         'efficientnetb5-Unet-DICE-warmRestart-10x3-bs16',      #0.66823, 0.67019
-        #'efficientnetb5-Unet-DICE-warmRestart-10x3-bs16-pl',   #0.67290, 0.67454
-        #'efficientnetb5-FPN-DICE-warmRestart-10x3-bs16-pl',    #0.67387, 0.67535
-        #'inceptionresnetv2-FPN-DICE-warmRestart-10x3-bs16',    #0.66852, 0.67027
-        'inceptionresnetv2-FPN-DICE-warmRestart-10x3-bs16-pl', #0.67133, 0.67311
-        'efficientnetb7-FPN-DICE-warmRestart-bs16-t0',         #0.67060, 0.67268
-        'efficientnetb7-Unet-DICE-warmRestart-10x3-bs16',      #0.67070, 0.67253
-        'efficientnetb7-FPN-DICEBCE-warmRestart-10x3-bs16-pl', #0.67332, 0.67511
-        #'efficientnetb7-FPN-DICE-reduceLR-bs16-t2',            #0.67135, 0.67346
+        'inceptionresnetv2-FPN-DICE-warmRestart-10x3-bs16', #0.67133, 0.67311
+        'efficientnetb7-Unet-DICE-warmRestart-10x3-bs16',         #0.67060, 0.67268
+        'efficientnetb7-FPN-DICE-warmRestart-10x3-bs16',      #0.67070, 0.67253
+        'efficientnetb7-FPN-DICE-warmRestart-10x3-bs16-pl', #0.67332, 0.67511
         ]
 
 # load seg results
@@ -122,7 +118,7 @@ df_seg_val['dice%d'%(len(segs)+1)] = df_seg_val.apply(lambda x: dice_np_rle(x['s
 
 if _save:
     df_seg_val.rename(columns={'s%d'%(len(segs)+1): 'EncodedPixels'}, inplace=True)
-    df_seg_val.to_csv('../output/valid_5fold_tta%d.csv'%(tta), index=None)
+    df_seg_val.to_csv('../output/%s/valid_5fold_tta%d.csv'%(ensemble_file_name, tta), index=None)
 
 print('')
 print('                 dice   |  c1   |  c2   |  c3   |  c4   |  neg  |  pos  | pos1  | pos2  | pos3  | pos4')
@@ -138,5 +134,5 @@ print('ensemble scores: %s'%res)
 if _save:
     df_seg_test.fillna('', inplace=True)
     df_seg_test['EncodedPixels'] = ensemble_rles_multi(df_seg_test[['s%d'%(i+1) for i in range(len(segs))]].values.tolist(), ts)
-    df_seg_test.to_csv('../output/test_5fold_tta%d_details.csv'%(tta), index=None)
-    df_seg_test.to_csv('../output/test_5fold_tta%d.csv'%(tta), index=None, columns=['Image_Label', 'EncodedPixels'])
+    df_seg_test.to_csv('../output/%s/test_5fold_tta%d_details.csv'%(ensemble_file_name, tta), index=None)
+    df_seg_test.to_csv('../output/%s/test_5fold_tta%d.csv'%(ensemble_file_name, tta), index=None, columns=['Image_Label', 'EncodedPixels'])

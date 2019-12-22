@@ -1,8 +1,7 @@
-# @Author: Xuan Cao <x0c02jg>
-# @Date:   2019-10-25, 9:10:8
-# @Email:  xuan.cao@walmartlabs.com
-# @Last modified by:   x0c02jg
-# @Last modified time: 2019-11-11, 4:12:33
+# @Author: Xuan Cao <xuan>
+# @Date:   2019-12-22, 12:40:03
+# @Last modified by:   xuan
+# @Last modified time: 2019-12-22, 1:32:35
 
 
 
@@ -87,7 +86,7 @@ def make_label_image(remove_class_2=False):
     new_df.to_csv(DATA_ROOT / file_name, index=False)
 
 
-# 分成kFold
+# build kFold
 
 def make_folds(n_folds: int) -> pd.DataFrame:
     df = pd.read_csv(DATA_ROOT / 'class_label.csv')

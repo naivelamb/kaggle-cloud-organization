@@ -1,10 +1,9 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Oct 26 22:46:04 2019
+# @Author: Xuan Cao <xuan>
+# @Date:   2019-12-22, 1:27:19
+# @Last modified by:   xuan
+# @Last modified time: 2019-12-22, 1:33:01
 
-@author: xuan
-"""
+
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -96,7 +95,7 @@ def load_seg_cls_pred(seg_name, name, tta, ts):
     df_val['EncodedPixels'] = '1 1'
     df_val['EncodedPixels'].loc[df_val['0'] < ts] = np.nan
     df_test['EncodedPixels'] = '1 1'
-    df_test['EncodedPixels'].loc[df_test['0'] < ts] = np.nan    
+    df_test['EncodedPixels'].loc[df_test['0'] < ts] = np.nan
     df_val.rename(columns={'EncodedPixels': name}, inplace=True)
     df_test.rename(columns={'EncodedPixels': name}, inplace=True)
     return df_val, df_test
@@ -133,25 +132,10 @@ df_train.rename(columns={'EncodedPixels': 'truth'}, inplace=True)
 
 _save=1
 tta=3
-#seg1 = ['densenet121-FPN-BCE-warmRestart-bs16-t10',
-#        'densenet161-FPN-BCE-warmRestart-bs16',
-#        ]
-seg1 = 'densenet121-FPN-BCE-warmRestart-bs16-t10'
-#seg1 = 'densenet121-Unet_ds-BCE-reduceLR-10x3-bs16'
-#seg1 = 'seg1_stacking_t1'
-#seg1 = 'resnet34-JPU-BCE-warmRestart-bs16'
-#seg2 = 'efficientnetb7-FPN-DICE-warmRestart-bs16-t0'
-seg2 = 'b5-Unet-inception-FPN-b7-Unet-b7-FPN'
-#seg2 = 'b5-FPNPL-inception-FPN-b7-FPN-b7-Unet-b7FPNPL'
+
+seg1 = 'densenet121-FPN-BCE-warmRestart-10x3-bs16'
 seg2 = 'b5-Unet-inception-FPN-b7-Unet-b7-FPN-b7-FPNPL'
-#seg2 = 'b5-UnetPL-inception-FPN-b7FPN-b7Unet-b7FPNPL'
-#classifier = 'efficientnetb1-cls-BCE-HVSFR-W11-reduceLR-t0'
-classifier = 'efficientnetb1-cls-BCE-HV-reduceLR-PL'
-classifier = 'efficientnetb3-cls-BCE-HV-reduceLR'
-#classifier = 'stacking_cls_t0'
-#classifier = 'res34-b1-b3-cls'
-#classifier = 'resnet34-cls-BCE-HVSFR-W11-reduceLR'
-#classifier = None
+classifier = 'efficientnetb1-cls-BCE-reduceLR-bs16-PL'
 # load classifier results
 if classifier:
     if 'stacking' in classifier:
@@ -170,9 +154,8 @@ if isinstance(seg1, list):
 elif 'stacking' in seg1:
     df_seg1_val, df_seg1_test = load_stacking(seg1, 3, ts=0.54)
 else:
-    df_seg1_val, df_seg1_test = load_seg_pred(seg1, 's1', 3)
-    #df_seg1_val, df_seg1_test = load_seg_cls_pred(seg1, 's1', 3, 0.6)
-    
+    df_seg1_val, df_seg1_test = load_seg_pred(seg1, 's1', 1)
+
 df_seg2_val, df_seg2_test = load_seg_pred(seg2, 's2', tta)
 # merge seg valid
 df_seg_val = pd.merge(df_seg1_val, df_seg2_val, how='left')
@@ -195,25 +178,7 @@ df_seg_val['dice1'] = df_seg_val.apply(lambda x: dice_np_rle(x['s1'], x['truth']
 df_seg_val['dice2'] = df_seg_val.apply(lambda x: dice_np_rle(x['s2'], x['truth']), axis=1)
 df_seg_val['dice3'] = df_seg_val['dice1'].copy()
 df_seg_val['dice3'].loc[df_seg_val['s1']!=''] = df_seg_val['dice2'].loc[df_seg_val['s1']!='']
-#df_seg_val['dice3'] = df_seg_val.apply(lambda x: dice_np_rle(x['s3'], x['truth']), axis=1)
 
-#print('Finding area size')
-#area_ts = []
-#best_dice_channel = []
-#for label in ['Fish', 'Flower', 'Gravel', 'Sugar']:
-#    df_tmp = df_seg_val[df_seg_val['cls'] == label].reset_index(drop=True).copy()
-#    best_dice, best_ts = 0, 0
-#    for area in tqdm.tqdm(range(0, 30000, 2000)):
-#        df_tmp['s3'].loc[df_tmp['area'] <= area] = ''
-#        df_tmp['dice'] = df_tmp.apply(lambda x: dice_np_rle(x['s3'], x['truth']), axis=1)
-#        current_dice = np.mean(df_tmp['dice'])
-#        if current_dice > best_dice:
-#            best_dice = current_dice
-#            best_ts = area
-#    area_ts.append(best_ts)
-#    best_dice_channel.append(best_dice)
-#print(area_ts)
-#print('Best dice: %.5f'%(np.mean(best_dice_channel)))
 if classifier:
     print('Finding cls threshold for empty')
     cls_ts = []
@@ -236,17 +201,12 @@ if classifier:
         cls_ts.append(best_ts)
         best_dice_channel.append(best_dice)
 
-    #cls_ts = [0.5]*4
     print(cls_ts)
-    #print('Best dice: %.5f'%(np.mean(best_dice_channel)))
 
     df_seg_val['s4'] = df_seg_val['s3'].copy()
     cls_mask = cls_ts * (df_seg_val.shape[0]//4)
     # remove empty
     df_seg_val['s4'].loc[df_seg_val['prob'] <= cls_mask] = ''
-    # fill non-empty
-    #cls_mask = [0.8]*4 *(df_seg_val.shape[0]//4)
-    #df_seg_val['s4'].loc[df_seg_val['prob'] > cls_mask] = df_seg_val['s2'].loc[df_seg_val['prob'] > cls_mask]
 
     df_seg_val['dice4'] = df_seg_val['dice3'].copy()
     df_seg_val['dice4'].loc[(df_seg_val['s4'] == '') & (df_seg_val['truth'] =='')] = 1
@@ -257,30 +217,6 @@ if classifier:
 
 if _save:
     df_seg_val.to_csv('../output/ensemble/valid_5fold_tta%d.csv'%(tta), index=None)
-#    print('Finding cls threshold for non-empty')
-#    cls_ts_1 = []
-#    best_dice_channel = []
-#    df_seg_val['dice_cls'] = df_seg_val['dice3'].copy()
-#    for label in ['Fish', 'Flower', 'Gravel', 'Sugar']:
-#        df_tmp = df_seg_val[df_seg_val['cls'] == label].reset_index(drop=True).copy()
-#        best_dice, best_ts = 0, 1
-#        best_dice = np.mean(df_tmp['dice_cls'])
-#        for ts in tqdm.tqdm(range(0, 100, 5)):
-#            ts /= 100
-#            df_tmp['s3'].loc[df_tmp['prob'] > ts] = df_tmp['s2'].loc[df_tmp['prob'] > ts]
-#            df_tmp['dice'] = df_tmp['dice_cls']
-#            df_tmp['dice'].loc[(df_tmp['s3'] == '') & (df_tmp['truth'] == '')] = 1
-#            df_tmp['dice'].loc[(df_tmp['s3'] != '') & (df_tmp['truth'] == '')] = 0
-#            df_tmp['dice'].loc[(df_tmp['s3'] == '') & (df_tmp['truth'] != '')] = 0
-#            df_tmp['dice'].loc[(df_tmp['prob'] > ts) & (df_tmp['s3'] != '')] = df_tmp['dice2'].loc[(df_tmp['prob'] > ts) & (df_tmp['s3'] != '')]
-#            current_dice = np.mean(df_tmp['dice'])
-#            if current_dice > best_dice:
-#                best_dice = current_dice
-#                best_ts = ts
-#        cls_ts_1.append(best_ts)
-#        best_dice_channel.append(best_dice)
-#    print(cls_ts_1)
-#    print('Best dice: %.5f'%(np.mean(best_dice_channel)))
 
 print('                 dice   |  c1   |  c2   |  c3   |  c4   |  neg  |  pos  | pos1  | pos2  | pos3  | pos4')
 res = compute_detail_score(df_seg_val, 'dice1')
@@ -313,7 +249,6 @@ if classifier:
     cls_mask = cls_ts * (df_seg_test.shape[0]//4)
     print('Test remove %d channels.' % (np.sum((df_seg_test['prob'] <= cls_mask) & (df_seg_test['EncodedPixels'].notnull()))))
     df_seg_test['EncodedPixels'].loc[df_seg_test['prob'] <= cls_mask] = np.nan
-    #df_seg_test['area'] = df_seg_val['EncodedPixels'].apply(lambda x: rle2mask(x, height=350, width=525).sum())
     if _save:
         df_seg_test.to_csv('../output/ensemble/test_5fold_tta%d_cls_details.csv'%(tta), index=None)
         df_seg_test.to_csv('../output/ensemble/test_5fold_tta%d_cls.csv'%(tta), index=None, columns=['Image_Label', 'EncodedPixels'])
