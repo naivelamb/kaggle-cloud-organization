@@ -4,7 +4,7 @@ Code for 3rd place solution in Kaggle Understanding Clouds from Satellite Images
 To read the brief description of the solution, please, refer to [the Kaggle post](https://www.kaggle.com/c/understanding_cloud_organization/discussion/117949). If you run into any trouble with the setup/code or have any questions please contact me at davidcao1991@gmail.com
 
 ## Solutuoin Overview
-![image](https://github.com/naivelamb/kaggle-cloud-organization/blob/master/png/summarize.png)
+![image](https://github.com/naivelamb/kaggle-cloud-organization/blob/master/png/overview.png)
 
 ## Archive Contents
 ```
@@ -31,7 +31,7 @@ $ kaggle competitions download -c understanding_cloud_organization
 $ unzip train_images_zip -d ./images
 $ unzip test_images_zip -d ./images
 ```
-Please make sure the unzipped train and test images are in the same folder named 'images'
+Please make sure the unzipped train and test images are in the same folder named "images".
 
 ## Data proprecessing
 This will convert the raw images to 384x576 and build .csv file for 5-fold info. The 5-fold info .csv is already included in ./kaggle-cloud-organization/files/
