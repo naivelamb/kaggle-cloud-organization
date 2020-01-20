@@ -117,7 +117,7 @@ def main():
     parser.add_argument('--n-folds', type=int, default=5)
     args = parser.parse_args()
     df = make_folds(n_folds=args.n_folds)
-    df.to_csv(DATA_ROOT / '5-folds_%d.csv'%SIZE, index=None)
+    df.to_csv(DATA_ROOT / ('5-folds_%d.csv'%(SIZE)), index=None)
 
 
 if __name__ == '__main__':
