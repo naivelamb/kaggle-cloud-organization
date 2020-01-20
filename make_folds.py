@@ -112,6 +112,7 @@ def make_folds(n_folds: int) -> pd.DataFrame:
 
 def main():
     resize_mask(SIZE)
+    make_label_image(remove_class_2=False)
     parser = argparse.ArgumentParser()
     parser.add_argument('--n-folds', type=int, default=5)
     args = parser.parse_args()
@@ -120,5 +121,4 @@ def main():
 
 
 if __name__ == '__main__':
-    make_label_image(remove_class_2=False)
     main()
