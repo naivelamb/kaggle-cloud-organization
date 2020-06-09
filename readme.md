@@ -3,7 +3,7 @@ Code for 3rd place solution in Kaggle Understanding Clouds from Satellite Images
 
 To read the brief description of the solution, please, refer to [the Kaggle post](https://www.kaggle.com/c/understanding_cloud_organization/discussion/117949). If you run into any trouble with the setup/code or have any questions please contact me at davidcao1991@gmail.com
 
-## Solutuoin Overview
+## Solution Overview
 ![image](https://github.com/naivelamb/kaggle-cloud-organization/blob/master/png/overview.png)
 
 ## Archive Contents
