@@ -116,7 +116,7 @@ numpydoc==0.8.0
 nvstrings-cuda92==0.8.0
 olefile==0.46
 opencv-python==4.1.0.25
-opencv-python-headless==4.1.0.25
+opencv-python-headless==4.2.0.32
 openpyxl==2.6.1
 packaging==19.0
 pandas==0.24.2
